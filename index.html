@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="Get in touch with ConnectSphere for innovative solutions. Request your free consultation today!">
-    <meta name="keywords" content="contact form, consultation, business solutions, technology, innovation">
+    <meta name="description" content="Get in touch with ConnectSphere for innovative solar solutions. Request your free consultation today!">
+    <meta name="keywords" content="solar energy, contact form, consultation, renewable energy, solar technology">
     <meta name="author" content="ConnectSphere">
     <title>Contact Us - ConnectSphere</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Poppins:wght@600;800&display=swap" rel="stylesheet">
@@ -21,16 +21,6 @@
             background: #121212;
             overflow-x: hidden;
             line-height: 1.6;
-        }
-
-        /* Particle Background */
-        #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: -1;
         }
 
         /* Navbar */
@@ -121,8 +111,7 @@
         /* Form Section */
         .form-section {
             min-height: 100vh;
-            background: url('https://images.unsplash.com/photo-1516321318428-4f5db7dd45a5') no-repeat center center/cover;
-            background-attachment: fixed;
+            background: url('https://images.pexels.com/photos/414837/pexels-photo-414837.jpeg') no-repeat center center/cover;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -151,7 +140,6 @@
             flex-direction: column;
             align-items: center;
             gap: clamp(1.5rem, 4vw, 2rem);
-            animation: fadeIn 1.5s ease;
         }
 
         .form-section h1 {
@@ -281,19 +269,6 @@
             color: #ec4899;
         }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Parallax Effect */
-        .form-section {
-            background-position: center;
-            background-size: cover;
-            will-change: transform;
-        }
-
         /* Responsive Design */
         @media (max-width: 1023px) {
             .form-section {
@@ -319,7 +294,6 @@
 
         @media (max-width: 767px) {
             .form-section {
-                background-attachment: scroll;
                 padding-top: clamp(4rem, 10vw, 6rem);
             }
 
@@ -351,9 +325,6 @@
     </style>
 </head>
 <body>
-    <!-- Particle Background -->
-    <div id="particles-js"></div>
-
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
@@ -369,13 +340,13 @@
     <!-- Form Section -->
     <section class="form-section">
         <div class="form-content">
-            <h1>Request Your Free Consultation</h1>
-            <p>Connect with us to explore innovative solutions tailored to your needs.</p>
-            <form class="contact-form" id="contact-form">
+            <h1>Request Your Free Solar Consultation</h1>
+            <p>Connect with us to explore innovative solar solutions tailored to your needs.</p>
+            <form class="contact-form" id="contact-form" action="https://script.google.com/macros/s/AKfycbxnFq1RK726AkDS6X_xomhhccsEfw-44yunUC-mxNRhJl-S_oFvLk61oNBKvvSa7Kgb/exec" method="POST" target="hidden-iframe">
                 <input type="text" name="name" placeholder="Your Name" required>
-                <input type="text" name="company" placeholder="Company Name" required>
+                <input type="text" name="company" placeholder="Company Name (Optional)">
                 <input type="text" name="district" placeholder="District/City" required>
-                <input type="tel" name="phone" placeholder="Contact Number" required>
+                <input type="tel" name="phone" placeholder="Contact Number" pattern="[0-9+]{10,15}" title="Enter a valid phone number (10-15 digits or +)" required>
                 <button type="submit">Submit Request</button>
                 <div class="form-message" id="form-message"></div>
             </form>
@@ -422,70 +393,43 @@
             lastScroll = currentScroll;
         });
 
-        // Parallax effect for form section background
-        window.addEventListener('scroll', () => {
-            const formSection = document.querySelector('.form-section');
-            const scrollPosition = window.scrollY;
-            formSection.style.backgroundPositionY = `${scrollPosition * 0.3}px`;
-        });
-
-        // Form Submission to Google Sheet with Redirect
+        // Form Submission with Validation and Redirect
         const form = document.getElementById('contact-form');
         const formMessage = document.getElementById('form-message');
 
-        form.addEventListener('submit', async (e) => {
+        form.addEventListener('submit', (e) => {
             e.preventDefault();
             formMessage.style.display = 'none';
             formMessage.textContent = '';
 
-            const formData = new FormData(form);
-            const data = {
-                name: formData.get('name'),
-                company: formData.get('company'),
-                district: formData.get('district'),
-                phone: formData.get('phone')
-            };
+            // Client-side validation
+            const name = form.querySelector('input[name="name"]').value.trim();
+            const district = form.querySelector('input[name="district"]').value.trim();
+            const phone = form.querySelector('input[name="phone"]').value.trim();
+            const phoneRegex = /^[0-9+]{10,15}$/;
 
-            try {
-                const response = await fetch('YOUR_GOOGLE_APPS_SCRIPT_URL', {
-                    method: 'POST',
-                    body: JSON.stringify(data),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (response.ok) {
-                    window.location.href = '/Thankyou.html';
-                } else {
-                    throw new Error('Submission failed');
-                }
-            } catch (error) {
+            if (!name || !district || !phoneRegex.test(phone)) {
                 formMessage.style.display = 'block';
-                formMessage.textContent = 'Error submitting form. Please try again.';
-                console.error('Form submission error:', error);
+                formMessage.textContent = 'Please fill all required fields with valid data.';
+                return;
             }
+
+            // Log submission data for debugging
+            console.log('Submitting form:', {
+                name,
+                company: form.querySelector('input[name="company"]').value.trim() || '',
+                district,
+                phone
+            });
+
+            // Submit form to hidden iframe
+            form.submit();
+            // Redirect to Thankyou.html after a short delay
+            setTimeout(() => {
+                console.log('Redirecting to Thankyou.html');
+                window.location.href = '/Thankyou.html';
+            }, 500);
         });
-
-        // Particle.js configuration (simplified for performance)
-        const particlesConfig = {
-            particles: {
-                number: { value: 60, density: { enable: true, value_area: 800 } },
-                color: { value: '#8b5cf6' },
-                shape: { type: 'circle' },
-                opacity: { value: 0.5, random: true },
-                size: { value: 3, random: true },
-                move: { enable: true, speed: 1.5, direction: 'none', random: true }
-            },
-            interactivity: {
-                detect_on: 'canvas',
-                events: { onhover: { enable: true, mode: 'repulse' }, onclick: { enable: true, mode: 'push' } },
-                modes: { repulse: { distance: 100 }, push: { particles_nb: 4 } }
-            }
-        };
-
-        // Placeholder for Particle.js (commented for production)
-        // particlesJS('particles-js', particlesConfig);
     </script>
 </body>
 </html>
